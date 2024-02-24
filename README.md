@@ -161,6 +161,7 @@ print(color)
 
 # Output: (255, 0, 0)
 ```
+### List of all [available colors](https://github.com/bzm10/ColorKit/blob/main/COLORLIST.md)
 
 # License
 
