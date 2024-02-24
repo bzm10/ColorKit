@@ -1,4 +1,4 @@
-# Author: Benjamen M.
+# Author: Benjamin M.
 from tkinter import colorchooser
 import colorsys
 import tkinter as tk
