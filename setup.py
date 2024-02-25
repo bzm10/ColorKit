@@ -8,7 +8,7 @@ DESCRIPTION = 'Python advanced color package'
 setup(
     name="ColorKit",
     version=VERSION,
-    author="Benjamin Markovits",
+    author="Benjamin Mark",
     author_email="bzmarkovits@yahoo.com",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
