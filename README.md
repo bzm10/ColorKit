@@ -40,6 +40,12 @@ rgb_color = ck.hex_to_rgb("#FF0000")
 # Convert RGB to CMYK
 cmyk_color = ck.rgb_to_cmyk((255, 0, 0))
 rgb_color = ck.cmyk_to_rgb((0, 1, 1, 0))
+
+# You can also specify the decimal places for the returned values. as the second argument.
+# NOTE: You can only specify the decimal places for colors converting from RGB to another color space.
+hsl_color = ck.rgb_to_xyz((255, 0, 0), 2)
+# Output: (41.24, 21.26, 1.93)
+
 ```
 
 ## You can use the same approach for the following color spaces:
@@ -98,17 +104,18 @@ To print a log message you can use the folowing code:
 from ColorKit import Warning, Error, Success,Info
 
 # Create a warning message in the terminal
-Warning("This is a warning message")
+Warning("This is a warning message",True,True)
 
 # Create an error message in the terminal
-Error("This is an error message")
+Error("This is an error message",True,True)
 
 # Create a success message in the terminal
-Success("This is a success message")
+Success("This is a success message",True,True)
 
 # Create an info message in the terminal
-Info("This is an info message")
+Info("This is an info message",True,True)
 ```
+### The first argument is the message, the second argument is if the message is bold, and the third argument is if the full message is colored or only the WARNING/ERROR/SUCCESS/INFO part. Use True or False for the second and third arguments.
 
 ## Custom Colored Terminal Outputs Example
     
@@ -120,7 +127,16 @@ from ColorKit import Print
 Print("This is a custom message", "red")
 Print("This is a custom message", "#FF0000")
 Print("This is a custom message", (255, 0, 0))
+
+# You can also add a style to the message
+# (bold, underline, italic, strike, overline, inverse, crossed)
+Print("This is a custom message", "red", "bold")
+
+# You can also add a background color to the message
+Print("This is a custom message", "red", "bold", "blue")
 ```
+
+### The first argument is the message, the second argument is the color, the third argument is the style, and the fourth argument is the background color. 
 
 ## Color Palette Example
 
