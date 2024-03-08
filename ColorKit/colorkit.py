@@ -34,7 +34,6 @@ class ColorPicker:
         cmyk = rgb_to_cmyk(rgb)
         return cmyk
     
-    
 # Color viewer
 def ViewColor(color):
     hex = color
@@ -67,7 +66,7 @@ def ViewColor(color):
     win.mainloop()
 
 # Colored print
-def Print(text, color):
+def Print(text, color,bg=None,style=None):
     # check if the color is a tuple or a string
     if type(color) == tuple:
         r, g, b = color
@@ -80,49 +79,82 @@ def Print(text, color):
             r, g, b = Color(color).rgb()
         else: 
             raise ValueError("Invalid color")
+    # Make sure that the bg is a valid color
+    if type(bg) == tuple:
+        r1,g1,b1 = bg
+    elif type(bg) == str:
+        if bg[0] == '#':
+            r1, g1, b1 = hex_to_rgb(bg)
+        elif bg.lower() in Color(bg).color_map:
+            r1, g1, b1 = Color(bg).rgb()
+        else:
+            raise ValueError("Invalid color")
+
+    # check if the text should be bold
+    style_code = {"bold": 1, "underline": 4, "italic": 3, "strike": 9, "overline": 53, "inverse": 7, "crossed": 9}.get(style, "")
     
+    if bg is not None:
+        colored_text = f"\033[{style_code};38;2;{r};{g};{b};48;2;{r1};{g1};{b1}m{text}\033[0m"
+    else:
+        colored_text = f"\033[{style_code};38;2;{r};{g};{b}m{text}\033[0m"
+    
+
     # print the colored text
-    colored_text = f"\033[38;2;{r};{g};{b}m{text}\033[0m"
     print(colored_text)
 
-def Error(error_message, bold=False):
+def Error(error_message, bold=False, full=True):
     # check if the text should be bold
-    if bold:
+    if bold and full:
         colored_text = f"\033[1;38;2;255;0;0mERROR: {error_message}\033[0m"
+    elif not full and not bold:
+        colored_text = f"\033[38;2;255;0;0mERROR: \033[0m{error_message}"
+    elif not full and bold:
+        colored_text = f"\033[1;38;2;255;0;0mERROR: \033[0m{error_message}"
     else:
         colored_text = f"\033[38;2;255;0;0mERROR: {error_message}\033[0m"
 
     # print the colored text
     print(colored_text)
 
-def Warning(warning_message, bold=False):
+def Warning(warning_message, bold=False, full=True):
     # check if the text should be bold
-    if bold:
+    if bold and full:
         colored_text = f"\033[1;38;2;255;165;0mWARNING: {warning_message}\033[0m"
+    elif not full and not bold:
+        colored_text = f"\033[38;2;255;165;0mWARNING: \033[0m{warning_message}"
+    elif not full and bold:
+        colored_text = f"\033[1;38;2;255;165;0mWARNING: \033[0m{warning_message}"
     else:
-        colored_text = f"\033[38;2;255;165;0mWARNING: {warning_message}\033[0m"
+        colored_text = f"\033[38;2;255;165;0mWARNING: \033[0m{warning_message}"
     print(colored_text)
 
-def Success(success_message, bold=False):
+def Success(success_message, bold=False, full=True):
     # check if the text should be bold
-    if bold:
+    if bold and full:
         colored_text = f"\033[1;38;2;0;128;0mSUCCESS: {success_message}\033[0m"
+    elif not full and not bold:
+        colored_text = f"\033[38;2;0;128;0mSUCCESS: \033[0m{success_message}"
+    elif not full and bold:
+        colored_text = f"\033[1;38;2;0;128;0mSUCCESS: \033[0m{success_message}"
     else:
         colored_text = f"\033[38;2;0;128;0mSUCCESS: {success_message}\033[0m"
     
     # print the colored text
     print(colored_text)
 
-def Info(info_message, bold=False):
+def Info(info_message, bold=False, full=True):
     # check if the text should be bold
-    if bold:
+    if bold and full:
         colored_text = f"\033[1;38;2;0;0;255mINFO: {info_message}\033[0m"
+    elif not full and not bold:
+        colored_text = f"\033[38;2;0;0;255mINFO: \033[0m{info_message}"
+    elif not full and bold:
+        colored_text = f"\033[1;38;2;0;0;255mINFO: \033[0m{info_message}"
     else:
         colored_text = f"\033[38;2;0;0;255mINFO: {info_message}\033[0m"
 
     # print the colored text
     print(colored_text)
-
 
 # Random color
 class RandomColor():
@@ -393,7 +425,7 @@ def hex_to_rgb(hex_color):
     return tuple(int(hex_color[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 # RGB to hsv
-def rgb_to_hsv(rgb):
+def rgb_to_hsv(rgb,decimals=2):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -409,9 +441,9 @@ def rgb_to_hsv(rgb):
     r, g, b = r / 255.0, g / 255.0, b / 255.0
     h, s, v = colorsys.rgb_to_hsv(r, g, b)
     # HSV values are in the range [0, 1], convert hue to degrees
-    h = round(h * 360, 2)
-    s = round(s * 100, 2)
-    v = round(v * 100, 2)
+    h = round(h * 360, decimals)
+    s = round(s * 100, decimals)
+    v = round(v * 100, decimals)
     return (h, s, v)
 
 def hsv_to_rgb(hsv):
@@ -433,7 +465,7 @@ def hsv_to_rgb(hsv):
     return (int(r * 255), int(g * 255), int(b * 255))
 
 # RGB to hsl
-def rgb_to_hsl(rgb):
+def rgb_to_hsl(rgb,decimals=2):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -450,7 +482,7 @@ def rgb_to_hsl(rgb):
     # Convert to percentages
     hsl = (h * 360, s * 100, l * 100)
     # round the values to 2 decimal places
-    return (round(hsl[0], 2), round(hsl[1], 2), round(hsl[2], 2))
+    return (round(hsl[0], decimals), round(hsl[1], decimals), round(hsl[2], decimals))
 
 def hsl_to_rgb(hsl):
     if type(hsl) != tuple:
@@ -469,7 +501,7 @@ def hsl_to_rgb(hsl):
     return (int(r * 255), int(g * 255), int(b * 255))
 
 # RGB to cmyk
-def rgb_to_cmyk(rgb):
+def rgb_to_cmyk(rgb,decimals=0):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -498,10 +530,16 @@ def rgb_to_cmyk(rgb):
     k = min_cmy
 
     # CMYK [0,1] -> CMYK [0,100]
-    c = round(c * 100, 2)
-    m = round(m * 100, 2)
-    y = round(y * 100, 2)
-    k = round(k * 100, 2)
+    if decimals > 0:
+        c = round(c * 100, decimals)
+        m = round(m * 100, decimals)
+        y = round(y * 100, decimals)
+        k = round(k * 100, decimals)
+    else:
+        c = int(c * 100)
+        m = int(m * 100)
+        y = int(y * 100)
+        k = int(k * 100)
 
     return c, m, y, k
 
@@ -527,7 +565,7 @@ def cmyk_to_rgb(cmyk):
     return int(r), int(g), int(b)
 
 #rgb to yuv
-def rgb_to_yuv(rgb):
+def rgb_to_yuv(rgb,decimals=2):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -541,7 +579,7 @@ def rgb_to_yuv(rgb):
     y = 0.299 * r + 0.587 * g + 0.114 * b
     u = -0.147 * r - 0.289 * g + 0.436 * b
     v = 0.615 * r - 0.515 * g - 0.100 * b
-    return round(y, 2), round(u, 2), round(v, 2)
+    return round(y, decimals), round(u, decimals), round(v, decimals)
 
 def yuv_to_rgb(yuv):
     if type(yuv) != tuple:
@@ -561,7 +599,7 @@ def yuv_to_rgb(yuv):
     return int(r), int(g), int(b)
 
 # rgb to yiq
-def rgb_to_yiq(rgb):
+def rgb_to_yiq(rgb,decimals=2):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -576,7 +614,7 @@ def rgb_to_yiq(rgb):
     y = 0.299 * r + 0.587 * g + 0.114 * b
     i = 0.596 * r - 0.274 * g - 0.322 * b
     q = 0.211 * r - 0.523 * g + 0.312 * b
-    return round(y, 2), round(i, 2), round(q, 2)
+    return round(y, decimals), round(i, decimals), round(q, decimals)
 
 def yiq_to_rgb(yiq):
     if type(yiq) != tuple:
@@ -596,7 +634,7 @@ def yiq_to_rgb(yiq):
     return int(r), int(g), int(b)
 
 # rgb to ycbcr
-def rgb_to_ycbcr(rgb):
+def rgb_to_ycbcr(rgb,decimals=3):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -611,7 +649,7 @@ def rgb_to_ycbcr(rgb):
     y = 0.299 * r + 0.587 * g + 0.114 * b
     cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b
     cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b
-    return round(y, 4), round(cb, 4), round(cr, 4)
+    return round(y, decimals), round(cb, decimals), round(cr, decimals)
 
 def ycbcr_to_rgb(ycbcr):
     if type(ycbcr) != tuple:
@@ -630,7 +668,7 @@ def ycbcr_to_rgb(ycbcr):
     return int(r), int(g), int(b)
 
 # rgb to xyz    
-def rgb_to_xyz(rgb):
+def rgb_to_xyz(rgb,decimals=5):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -651,9 +689,9 @@ def rgb_to_xyz(rgb):
     y = r * 0.2126729 + g * 0.7151522 + b * 0.0721750
     z = r * 0.0193339 + g * 0.1191920 + b * 0.9503041
 
-    x = round(x, 5)
-    y = round(y, 5)
-    z = round(z, 5)
+    x = round(x, decimals)
+    y = round(y, decimals)
+    z = round(z, decimals)
 
     return x, y, z
 
@@ -680,7 +718,7 @@ def xyz_to_rgb(xyz):
     return int(r * 255), int(g * 255), int(b * 255)
 
 # rgb to lab
-def rgb_to_lab(rgb):
+def rgb_to_lab(rgb,decimals=3):
     # Convert RGB to XYZ without the colorsys module
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
@@ -718,7 +756,7 @@ def rgb_to_lab(rgb):
     a = max(-128, min(127, (x - y) * 500))
     b = max(-128, min(127, (y - z) * 200))
 
-    return round(l, 3), round(a, 3), round(b, 3)
+    return round(l, decimals), round(a, decimals), round(b, decimals)
 
 def lab_to_rgb(lab):
     if type(lab) != tuple:
@@ -752,7 +790,7 @@ def lab_to_rgb(lab):
     return int(r * 255), int(g * 255), int(b * 255)
 
 # RGB to luv
-def rgb_to_luv(rgb):
+def rgb_to_luv(rgb,decimals=3):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -782,7 +820,8 @@ def rgb_to_luv(rgb):
     l = 116 * y - 16
     u = 13 * l * (4 * x / (x + 15 * y + 3 * z) - 0.19793943)
     v = 13 * l * (9 * y / (x + 15 * y + 3 * z) - 0.46831096)
-    return l, u, v
+
+    return round(l, decimals), round(u, decimals), round(v, decimals)
 
 def luv_to_rgb(luv):
     if type(luv) != tuple:
@@ -813,7 +852,7 @@ def luv_to_rgb(luv):
     return int(r * 255), int(g * 255), int(b * 255)
 
 # rgb to lch
-def rgb_to_lch(rgb):
+def rgb_to_lch(rgb,decimals=3):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -844,7 +883,7 @@ def rgb_to_lch(rgb):
     b = 200 * (y - z)
     c = (a ** 2 + b ** 2) ** 0.5
     h = math.degrees(math.atan2(b, a))
-    return l, c, h
+    return round(l, decimals), round(c, decimals), round(h, decimals)
 
 def lch_to_rgb(lch):
     if type(lch) != tuple:
@@ -863,7 +902,7 @@ def lch_to_rgb(lch):
     return lab_to_rgb((l, a, b))
 
 # rgb to lms
-def rgb_to_lms(rgb):
+def rgb_to_lms(rgb,decimals=3):
     if type(rgb) != tuple:
         raise TypeError("The RGB must be a tuple")
     if len(rgb) != 3:
@@ -878,7 +917,7 @@ def rgb_to_lms(rgb):
     l = 0.3811 * r + 0.5783 * g + 0.0402 * b
     m = 0.1967 * r + 0.7244 * g + 0.0782 * b
     s = 0.0241 * r + 0.1288 * g + 0.8444 * b
-    return l, m, s
+    return round(l, decimals), round(m, decimals), round(s, decimals)
 
 def lms_to_rgb(lms):
     if type(lms) != tuple:
