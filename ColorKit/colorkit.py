@@ -1,7 +1,9 @@
 # Author: Benjamin M.
-from tkinter import colorchooser
+try:
+    import tkinter as tk
+except ImportError as exh:
+    tk = exh
 import colorsys
-import tkinter as tk
 from random import randint
 import colorsys
 import math
@@ -10,32 +12,36 @@ import math
 class ColorPicker:
     def __init__(self):
         self.color = None
+        if isinstance(tk, Exception):
+            raise tk
 
     def rgb(self):
-        self.color = colorchooser.askcolor()
+        self.color = tk.colorchooser.askcolor()
         rgb = self.color[0]
         return rgb
     
     def hex(self):
-        self.color = colorchooser.askcolor()
+        self.color = tk.colorchooser.askcolor()
         rgb = self.color[0]
         hex = rgb_to_hex(rgb)
         return hex
     
     def hsl(self):
-        self.color = colorchooser.askcolor()
+        self.color = tk.colorchooser.askcolor()
         rgb = self.color[0]
         hsl = rgb_to_hsl(rgb)
         return hsl
     
     def cmyk(self):
-        self.color = colorchooser.askcolor()
+        self.color = tk.colorchooser.askcolor()
         rgb = self.color[0]
         cmyk = rgb_to_cmyk(rgb)
         return cmyk
     
 # Color viewer
 def ViewColor(color):
+    if isinstance(tk, Exception):
+        raise tk
     hex = color
     if "#" not in color:
         try:
